@@ -1,11 +1,14 @@
-
 import streamlit as st
+from dotenv import load_dotenv
+load_dotenv() 
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import datetime
+import os
+import json
 
 class minone: 
     def __init__(self,user,content,location,date):
@@ -18,9 +21,20 @@ class minone:
 
 def get_gs():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("service_account.json", scope) 
+    # 환경 변수에서 JSON 인증 정보 문자열을 가져옴
+    creds_json_str = os.getenv("GSPREAD_SERVICE_ACCOUNT")
+    if creds_json_str is None:
+        st.error("GSPREAD_SERVICE_ACCOUNT 환경 변수를 설정해주세요!")
+        st.stop()
+    
+    # JSON 문자열을 딕셔너리로 변환
+    creds_dict = json.loads(creds_json_str)
+    
+    # 딕셔너리를 사용해 인증
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     return gspread.authorize(creds)
 
+@st.cache_data
 def load_data_from_sheet(_client):
     sheet = _client.open("social-problem").worksheet("Sheet1") 
     all_values = sheet.get_all_values() 
@@ -110,7 +124,3 @@ with col2:
                 st.cache_data.clear()
             except Exception as e:
                 st.error(f"Google Sheets 저장에 실패했습니다: {e}")
-
-/sdasda
-
-

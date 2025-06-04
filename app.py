@@ -6,38 +6,6 @@ from streamlit_folium import st_folium
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import datetime
-import os
-import json
-from dotenv import load_dotenv
-
-load_dotenv()
-
-def get_gspread_client():
-    """
-    환경변수에서 GCP 서비스 계정 인증 정보를 읽어와
-    gspread 클라이언트 객체를 반환합니다.
-    """
-    # 환경변수에서 인증 정보(JSON 문자열)를 가져옵니다.
-    creds_json_str = os.getenv("GCP_CREDS_JSON")
-    
-    if not creds_json_str:
-        st.error("GCP 인증 정보를 찾을 수 없습니다. .env 파일을 확인해주세요.")
-        return None
-        
-    try:
-        # JSON 문자열을 딕셔너리로 변환합니다.
-        creds_dict = json.loads(creds_json_str)
-        
-        # 딕셔너리를 사용하여 gspread 클라이언트를 인증합니다.
-        client = gspread.service_account_from_dict(creds_dict)
-        return client
-    except json.JSONDecodeError:
-        st.error("GCP 인증 정보의 형식이 잘못되었습니다. JSON이 맞는지 확인해주세요.")
-        return None
-    except Exception as e:
-        st.error(f"Google Sheets 인증 중 오류 발생: {e}")
-        return None
-
 
 class minone: 
     def __init__(self,user,content,location,date):
@@ -71,7 +39,6 @@ def load_data_from_sheet(_client):
 st.set_page_config(page_title="민원 신고 앱", layout="wide")
 st.title("민원 신고 앱")
 
-gspread_client = get_gspread_client()
 
 gspread_client = get_gs()
 if gspread_client:

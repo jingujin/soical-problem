@@ -111,3 +111,6 @@ with col2:
             except Exception as e:
                 st.error(f"Google Sheets 저장에 실패했습니다: {e}")
 
+
+
+

@@ -100,6 +100,9 @@ with col2:
         author = st.text_input("작성자 이름") 
         content = st.text_area("민원 상세 내용") 
         date = st.date_input("작성 날짜", value=datetime.date.today()) 
+        menu= ['기물/기자재','교통', '아파트' , '쓰레기', '주정차 단속', '치안']
+        type = st.sidebar.selectbox("민원 분류", menu) 
+
         
         submit_button = st.form_submit_button("민원 제출")
 

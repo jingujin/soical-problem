@@ -124,3 +124,37 @@ with col2:
                 st.cache_data.clear()
             except Exception as e:
                 st.error(f"Google Sheets 저장에 실패했습니다: {e}")
+st.divider()
+st.subheader("접수된 민원 현황 조회")
+
+if df_minone.empty:
+    st.warning("아직 접수된 민원이 없습니다다.")
+else:
+    tab1, tab2, tab3 = st.tabs(["모든 민원 ","작성자별 조회", "날짜별 통계"])
+    with tab1:
+        st.write("모든 민원을 정리합니다.")
+        st.dataframe(df_minone)
+
+    with tab2:
+        st.write("특정 작성자의 민원을 검색합니다.")
+        search_user = st.text_input("조회할 작성자 이름 입력", key="search_input")
+        if search_user:
+            find_df = df_minone[df_minone["User"].str.lower() == search_user.lower()]
+            count = len(find_df)
+            st.write(f"'{search_user}' 님의 민원 목록 (총 {count} 건)")
+            if count > 0:
+                st.dataframe(find_df[['User', 'Content', 'Date']]) 
+            else:
+                st.info("해당 작성자의 민원이 없습니다.")
+    with tab3:
+        st.write(" 날짜별 민원 접수 건수")
+        try:
+            # 날짜 데이터를 datetime 객체로 변환
+            df_minone["Date_obj"] = pd.to_datetime(df_minone["Date"], errors='coerce').dt.date
+            df_minone.dropna(subset=['Date_obj'], inplace=True) 
+            date_counts = df_minone.groupby("Date_obj").size()
+            date_counts = date_counts.sort_index()
+            st.bar_chart(date_counts)
+            
+        except Exception as e:
+            st.error(f"차트 생성 중 오류 발생: {e}")

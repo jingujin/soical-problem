@@ -1,5 +1,5 @@
 # Google Cloud credentials
-service_account.json
+my_key.json
 
 # Environment variables file
 .env

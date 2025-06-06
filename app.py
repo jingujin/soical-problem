@@ -88,6 +88,8 @@ with col1:
 
 with col2:
     st.subheader("민원 내용 작성")
+    menu= ['기물/기자재','교통', '아파트' , '쓰레기', '주정차 단속', '치안']
+    type = st.sidebar.selectbox("민원 분류", menu) 
     if map_info and map_info.get("last_clicked"):
             st.write(":red[위치가 선택이 되었으니 민원을 작성하세요]")
     with st.form(key="minone_form", clear_on_submit=True):

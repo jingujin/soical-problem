@@ -1,22 +1,25 @@
 import streamlit as st
-from dotenv import load_dotenv
 import pandas as pd
+from dotenv import load_dotenv
+load_dotenv()  
+
 import folium
 from streamlit_folium import st_folium
+
 import gspread
 from gspread.exceptions import APIError
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
+
 import datetime
 import os
 import json
 import io
+
 from pathlib import Path
 import altair as alt
 
-
-load_dotenv()  
 
 class minone:  
     def __init__(self,user,content,location,date,minone_type): 
@@ -36,10 +39,7 @@ def get_gs():
             st.stop()    
     full_key_path = Path(__file__).parent / key_path_from_env
 
-    creds = Credentials.from_service_account_file(
-            full_key_path,
-            scopes=scope
-        )    
+    creds = Credentials.from_service_account_file(full_key_path,scopes=scope)    
     gs_client = gspread.authorize(creds)
     drive_service = build('drive', 'v3', credentials=creds)
     return gs_client, drive_service
@@ -64,8 +64,7 @@ def upload_image(drive_service, image_file, folder_id):
     except Exception as e:
         st.error(f"이미지 업로드 실패: {e}")
         return None
-
-
+    
 
 @st.cache_data(ttl=300) 
 def load_data(_client): 
@@ -176,11 +175,11 @@ else:
 
 with tab1:
     st.write(f"#### 총 {len(df_minone)}건의 민원 목록")
-    df_minone = df_minone.reset_index()  # 기존 인덱스(입력 순서) 보존
+    df_minone = df_minone.reset_index() 
     sorted_df = df_minone.sort_values(by=['Date', 'index'], ascending=[True, True])
     for idx, row in sorted_df.iterrows():
         with st.expander(f"**{row.get('Date', 'N/A')} / {row.get('Type', 'N/A')} / {row.get('User', 'N/A')}**"):
-            st.markdown(f"**내용:** {row.get('Content', 'N/A')}")
+            st.markdown(f"내용: {row.get('Content', 'N/A')}")
             image_url = str(row.get('ImageURL', '') or '')
             if pd.isna(image_url):
                 image_url = ''
@@ -204,7 +203,7 @@ with tab2:
         st.write(f"**'{search_user}'** 님으로 검색된 민원 (총 {count} 건)")
         for idx, row in find_df.iterrows():
             with st.expander(f"{row.get('Date', 'N/A')} / {row.get('Type', 'N/A')} / {row.get('User', 'N/A')}"):
-                st.markdown(f"**내용:** {row.get('Content', 'N/A')}")
+                st.markdown(f"내용: {row.get('Content', 'N/A')}")
                 image_url = str(row.get('ImageURL', '') or '').strip()
                 if image_url.startswith('http'):
                     st.image(image_url, caption="첨부 이미지", width=300)
